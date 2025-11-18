@@ -35,12 +35,24 @@
     </div>
 
     <!-- Buscador -->
-    <div class="mb-3">
-      <input 
-        type="text" 
-        placeholder="Buscar" 
-        class="w-full rounded-full px-4 py-2 border-0 text-gray-900 placeholder-gray-400"
-      >
+    <div class="mb-3 relative">
+      <div class="flex gap-2">
+        <input 
+          type="text" 
+          id="searchInput"
+          placeholder="Buscar noticias..." 
+          class="w-full rounded-full px-4 py-2 border-0 text-gray-900 placeholder-gray-400 text-sm"
+          autocomplete="off"
+        >
+        <button type="button" onclick="performSearch()" class="bg-white text-[#336892] rounded-full p-2 hover:bg-gray-100 transition">
+          <i class="bi bi-search"></i>
+        </button>
+      </div>
+      
+      <!-- Resultados en tiempo real -->
+      <div id="liveResults" class="absolute top-full left-0 right-0 bg-white mt-2 rounded-lg shadow-lg hidden z-50 max-h-80 overflow-y-auto border">
+        <!-- Los resultados se cargan aquí dinámicamente -->
+      </div>
     </div>
 
     <!-- Categorías -->
@@ -72,12 +84,10 @@
       <a href="https://www.tiktok.com/@canal.utv" class="text-white text-2xl"><i class="bi bi-tiktok"></i></a>
       <a href="https://www.instagram.com/canal.utv/?fbclid=IwY2xjawN92z1leHRuA2FlbQIxMABicmlkETE4T1ZwOG02VXJBeUl3TFFOc3J0YwZhcHBfaWQQMjIyMDM5MTc4ODIwMDg5MgABHu0rb8PFi1n7hEsMZ3acBxqGjhhae27T4QHcAdmk00V2Uy1nET6PUZeBqX6b_aem_oLy1yhUUIHfQ1wGIZ0Pu5A" class="text-white text-2xl"><i class="bi bi-instagram"></i></a>
       <a href="https://www.youtube.com/@redesutv2025" class="text-white text-2xl"><i class="bi bi-youtube"></i></a>
-     <a href="https://x.com/canal_utv" class="text-white text-2xl"><i class="bi bi-x"></i></a>
-     <a href="{{ route('login') }}" class="text-white text-2xl hover:text-gray-300 transition">
-    <i class="bi bi-person-circle"></i>
-    </a>
-
-
+      <a href="https://x.com/canal_utv" class="text-white text-2xl"><i class="bi bi-x"></i></a>
+      <a href="{{ route('login') }}" class="text-white text-2xl hover:text-gray-300 transition">
+        <i class="bi bi-person-circle"></i>
+      </a>
     </div>
   </div>
 </nav>
@@ -115,9 +125,6 @@
       });
     }
 
-
-    
-
     // Filtros desplegables
     const toggleFiltros = document.getElementById('toggleFiltros');
     const filtrosLista = document.getElementById('filtrosLista');
@@ -129,5 +136,82 @@
         filtArrow.classList.toggle('rotate-180');
       });
     }
+
+    // Búsqueda en tiempo real
+    const searchInput = document.getElementById('searchInput');
+    const liveResults = document.getElementById('liveResults');
+    
+    if (searchInput) {
+        let timeoutId;
+        
+        searchInput.addEventListener('input', function() {
+            clearTimeout(timeoutId);
+            const query = this.value.trim();
+            
+            // Ocultar resultados si hay menos de 2 caracteres
+            if (query.length < 2) {
+                liveResults.classList.add('hidden');
+                return;
+            }
+            
+            // Esperar 500ms después de que el usuario deje de escribir
+            timeoutId = setTimeout(() => {
+                fetch(`/buscar-live?q=${encodeURIComponent(query)}`)
+                    .then(response => {
+                        if (!response.ok) throw new Error('Error en la búsqueda');
+                        return response.json();
+                    })
+                    .then(data => {
+                        if (data.noticias && data.noticias.length > 0) {
+                            liveResults.innerHTML = data.noticias.map(noticia => `
+                                <a href="/noticia/${noticia.ruta_slug}" class="block p-3 hover:bg-gray-100 border-b last:border-b-0 transition">
+                                    <div class="font-semibold text-gray-800 text-sm">${noticia.titulo}</div>
+                                    ${noticia.entradilla ? `<div class="text-xs text-gray-600 mt-1">${noticia.entradilla.substring(0, 80)}...</div>` : ''}
+                                    <div class="text-xs text-gray-500 mt-1">${new Date(noticia.fecha_publicacion).toLocaleDateString('es-ES')}</div>
+                                </a>
+                            `).join('');
+                            liveResults.classList.remove('hidden');
+                        } else {
+                            liveResults.innerHTML = '<div class="p-3 text-gray-500 text-sm">No se encontraron resultados</div>';
+                            liveResults.classList.remove('hidden');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        liveResults.innerHTML = '<div class="p-3 text-red-500 text-sm">Error en la búsqueda</div>';
+                        liveResults.classList.remove('hidden');
+                    });
+            }, 500);
+        });
+        
+        // Ocultar resultados al hacer clic fuera
+        document.addEventListener('click', function(e) {
+            if (!searchInput.contains(e.target) && !liveResults.contains(e.target)) {
+                liveResults.classList.add('hidden');
+            }
+        });
+        
+        // Buscar con Enter
+        searchInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                performSearch();
+            }
+        });
+        
+        // Ocultar con ESC
+        searchInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                liveResults.classList.add('hidden');
+            }
+        });
+    }
   });
+
+  // Función para búsqueda normal
+  function performSearch() {
+      const query = document.getElementById('searchInput').value.trim();
+      if (query.length > 0) {
+          window.location.href = `/buscar?q=${encodeURIComponent(query)}`;
+      }
+  }
 </script>

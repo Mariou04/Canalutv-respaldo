@@ -13,6 +13,7 @@
 <x-nav />
 
 
+
     <!-- Componente de categorías -->
     <x-categorias-nav />
 
@@ -55,7 +56,10 @@
 
   </div>
 </section>
-
+<br>
+  <p class="text-gray-600 text-lg text-left max-w-7xl mx-auto">
+            Canal UTV es el medio universitario de la UDES donde se producen contenidos informativos y culturales que conectan la vida académica con la comunidad. Es un espacio de aprendizaje, creatividad y servicio a través de proyectos audiovisuales.
+        </p>
 <script>
 document.addEventListener("DOMContentLoaded", async () => {
   const climaContainer = document.getElementById("clima");

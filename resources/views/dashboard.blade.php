@@ -43,6 +43,9 @@
                             </div>
                         @endif
 
+                        
+<br>
+
                         <!-- Enlaces para periodistas y admin -->
                         @if(in_array(Auth::user()->rol_id, [1, 2]))
                             <div class="mb-8 p-4 border-l-4 border-purple-500 bg-purple-50">
@@ -105,6 +108,7 @@
             </div>
         </div>
     </div>
+    
 
     <!-- Editar Pico y Placa -->
 <a href="{{ route('admin.pico_placa.edit') }}" 

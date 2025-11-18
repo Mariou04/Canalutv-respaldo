@@ -33,6 +33,28 @@ class AdminController extends Controller
         return view('admin.panel', compact('estadisticas', 'noticiasPendientes', 'noticiasRecientes'));
     }
 
+    // En App\Http\Controllers\AdminController.php
+public function destroyUsuario(User $usuario)
+{
+    // Evitar que un admin se elimine a sí mismo
+    if ($usuario->id === auth()->id()) {
+        return redirect()->route('admin.gestion-usuarios')
+            ->with('error', 'No puedes eliminar tu propio usuario');
+    }
+
+    
+    $adminsCount = User::where('rol_id', 1)->count();
+    if ($usuario->rol_id == 1 && $adminsCount <= 1) {
+        return redirect()->route('admin.gestion-usuarios')
+            ->with('error', 'No puedes eliminar el último administrador');
+    }
+
+    $usuario->delete();
+
+    return redirect()->route('admin.gestion-usuarios')
+        ->with('success', 'Usuario eliminado exitosamente');
+}
+
     public function moderarNoticias()
     {
         $noticias = Noticia::with(['categoria', 'usuario'])
@@ -51,6 +73,7 @@ class AdminController extends Controller
 
         return redirect()->back()->with('success', 'Noticia aprobada y publicada exitosamente.');
     }
+    
 
     public function rechazarNoticia(Request $request, Noticia $noticia)
     {

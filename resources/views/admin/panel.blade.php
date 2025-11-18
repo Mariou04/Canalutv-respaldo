@@ -3,11 +3,22 @@
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
             🛠️ Panel de Administración
         </h2>
+
     </x-slot>
         <br>
 <a href="{{ route('dashboard') }}" class="bg-white text-blue-800 px-6 py-2 rounded-lg font-semibold hover:bg-blue-100 transition inline-flex items-center">
     <i class="bi bi-arrow-left me-2"></i> Volver
 </a>
+<br>
+<div class="p-4 bg-white border rounded-lg shadow">
+    <h2 class="text-lg font-semibold mb-2">Denuncias</h2>
+    <p class="text-sm text-gray-600 mb-3">Revisa todas las denuncias enviadas por los usuarios.</p>
+    <a href="{{ route('denuncia.index') }}"
+       class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg">
+        Ver recibidas
+    </a>
+</div>
+
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <!-- Estadísticas -->
@@ -169,6 +180,8 @@
         </div>
     </div>
 
+    
+
 
 
 
@@ -212,4 +225,6 @@
             document.getElementById('motivo_rechazo').value = '';
         }
     </script>
+
+    
 </x-app-layout>

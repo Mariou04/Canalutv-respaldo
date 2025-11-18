@@ -3,7 +3,9 @@
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\NoticiaController;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\DenunciaController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Auth\RegisteredUserController;
 
 // ==================== RUTAS PÚBLICAS ====================
 
@@ -66,6 +68,11 @@ Route::middleware(['auth', 'admin'])->group(function () {
     Route::post('/admin/noticias/{noticia}/aprobar', [AdminController::class, 'aprobarNoticia'])->name('admin.noticias.aprobar');
     Route::post('/admin/noticias/{noticia}/rechazar', [AdminController::class, 'rechazarNoticia'])->name('admin.noticias.rechazar');
     Route::post('/admin/usuarios/{usuario}/toggle', [AdminController::class, 'toggleUsuario'])->name('admin.usuarios.toggle');
+    Route::get('/register', [RegisteredUserController::class, 'create'])->name('register');
+    Route::post('/register', [RegisteredUserController::class, 'store']);
+    // Ruta para eliminar usuario
+    Route::delete('/admin/usuarios/{usuario}', [AdminController::class, 'destroyUsuario'])
+        ->name('admin.usuarios.destroy');
 });
 
 // Administradores y periodistas - GESTIÓN DE NOTICIAS
@@ -90,5 +97,24 @@ Route::get('/api/weather', [WeatherController::class, 'getWeather']);
 
 Route::get('/categoria/{slug}', [NoticiaController::class, 'categoria'])->name('categoria.show');
 
+// Ver formulario
+Route::get('/denuncia-ciudadana', [DenunciaController::class, 'formulario'])
+    ->name('denuncia.formulario');
 
+// Enviar denuncia
+Route::post('/denuncia-ciudadana', [DenunciaController::class, 'store'])
+    ->name('denuncia.store');
 require __DIR__.'/auth.php';
+
+// Ver todas las denuncias EN ADMIN (pero tú decides quién puede entrar)
+Route::get('/admin/denuncias', [DenunciaController::class, 'index'])
+    ->name('denuncia.index');
+
+// Ruta normal de búsqueda (para cuando presionan enter)
+Route::get('/buscar', [NoticiaController::class, 'buscar'])->name('buscar');
+
+// Ruta para búsqueda en tiempo real (AJAX)
+Route::get('/buscar-live', [NoticiaController::class, 'buscarLive'])->name('buscar.live');
+
+// Ruta para ver noticia individual - usa ruta_slug
+Route::get('/noticia/{slug}', [NoticiaController::class, 'show'])->name('noticia.show');

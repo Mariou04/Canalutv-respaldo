@@ -10,11 +10,12 @@
                 <div class="text-sm opacity-90 mt-2">{{ $categoria->descripcion }}</div>
             </a>
             @endforeach
-            <a href="/denuncia-ciudadana"
+            <a href="{{ route('denuncia.formulario') }}"
    class="bg-white hover:bg-yellow-500 text-black p-2 rounded-lg text-center transition duration-300 transform hover:scale-105 shadow-md">
     <div class="text-lg font-semibold">Denuncia Ciudadana</div>
     <div class="text-sm opacity-90 mt-2">Reporta situaciones en tu comunidad</div>
 </a>
+
     <!-- Botón de Pauta con Nosotros (WhatsApp) -->
     <a href="https://wa.me/573001234567" target="_blank"
        class="bg-white-500 hover:bg-yellow-500 text-black p-2 rounded-lg text-center transition duration-300 transform hover:scale-105 shadow-md">
